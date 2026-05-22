@@ -1,0 +1,242 @@
+/* ══════════════════════════════════════════════════════════════ */
+/* EDIT PROFILE PAGE STYLES */
+/* ══════════════════════════════════════════════════════════════ */
+
+body {
+  padding: 24px;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ── Page Header ── */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.btn-back {
+  padding: 10px 16px;
+  background: var(--white);
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-700);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.18s;
+}
+
+.btn-back:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--blue-light);
+}
+
+.btn-back svg { width: 16px; height: 16px; }
+
+/* ── Profile Card ── */
+.profile-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.profile-header {
+  padding: 32px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  background: var(--blue);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 32px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.user-info h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 4px;
+}
+
+.user-info p {
+  font-size: 13px;
+  color: var(--gray-500);
+}
+
+/* ── Form Content ── */
+.form-content {
+  padding: 32px;
+}
+
+.form-section {
+  margin-bottom: 32px;
+}
+
+.form-section:last-child { margin-bottom: 0; }
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-700);
+  margin-bottom: 6px;
+}
+
+.input-wrap.no-icon input {
+  padding-left: 14px;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--gray-400);
+  margin-top: 6px;
+}
+
+/* ── Status Section ── */
+.status-section {
+  padding: 16px;
+  background: var(--gray-50);
+  border-radius: var(--radius-md);
+  margin-bottom: 18px;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.status-row span:first-child {
+  color: var(--gray-700);
+  font-weight: 500;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--blue-light);
+  color: var(--blue);
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.status-badge.inactive {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+/* ── Form Actions ── */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.btn-primary {
+  flex: 1;
+  padding: 13px;
+  background: var(--blue);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.18s;
+}
+
+.btn-primary:hover { background: var(--blue-dark); }
+.btn-primary:disabled { opacity: 0.65; cursor: not-allowed; }
+
+.btn-secondary {
+  flex: 1;
+  padding: 13px;
+  background: transparent;
+  color: var(--blue);
+  border: 1.5px solid var(--blue);
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.btn-secondary:hover { background: var(--blue-light); }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>e-Library System — Sign In</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles/shared.css" />
+    <link rel="stylesheet" href="../styles/login.css" />
+  </head>
+  <body>
+    <!-- Brand -->
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">
+        <!-- Open book icon -->
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M4 8C4 8 8 6 16 6C24 6 28 8 28 8V24C28 24 24 22 16 22C8 22 4 24 4 24V8Z"
+            fill="#2563EB"
+            fill-opacity="0.15"
+            stroke="#2563EB"
+            stroke-width="1.5"
+            stroke-linejoin="round"
+          />
+          <path d="M16 6V22" stroke="#2563EB" stroke-width="1.5" />
+          <circle cx="23" cy="9" r="5" fill="#2563EB" />
+          <path
+            d="M21 9L22.5 10.5L25.5 7.5"
+            stroke="white"
+            stroke-width="1.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+      <h1>e-Library System</h1>
+      <p>Access tons of books and other resources</p>
+    </div>
+
+    <!-- Card -->
+    <div class="card" role="main">
+      <!-- Alert banner -->
+      <div
+        class="alert alert-error"
+        id="alertBanner"
+        role="alert"
+        aria-live="polite"
+      >
+        <svg viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        <span id="alertText">Invalid email or password.</span>
+      </div>
+
+      <!-- Role Toggle -->
+      <div class="role-toggle" role="tablist" aria-label="Login as">
+        <button
+          class="role-btn active"
+          id="btnMember"
+          role="tab"
+          aria-selected="true"
+          onclick="setRole('Member')"
+        >
+          <!-- person icon -->
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+          >
+            <circle cx="10" cy="6" r="3" />
+            <path d="M4 18c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke-linecap="round" />
+          </svg>
+          Member
+        </button>
+        <button
+          class="role-btn"
+          id="btnLibrarian"
+          role="tab"
+          aria-selected="false"
+          onclick="setRole('Librarian')"
+        >
+          <!-- librarian / badge icon -->
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+          >
+            <rect x="4" y="3" width="12" height="14" rx="2" />
+            <circle cx="10" cy="8" r="2.2" />
+            <path d="M6 15c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke-linecap="round" />
+          </svg>
+          Librarian
+        </button>
+      </div>
+
+      <!-- Email -->
+      <div class="field">
+        <div class="field-header"><label for="emailInput">Email</label></div>
+        <div class="input-wrap">
+          <span class="input-icon" aria-hidden="true">
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+            >
+              <rect x="2" y="5" width="16" height="11" rx="2" />
+              <path d="M2 7l8 5 8-5" stroke-linecap="round" />
+            </svg>
+          </span>
+          <input
+            type="email"
+            id="emailInput"
+            placeholder="name@university.edu"
+            autocomplete="email"
+          />
+        </div>
+        <div class="error-msg" id="emailErr">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span id="emailErrText">Please enter a valid email address.</span>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="field">
+        <div class="field-header">
+          <label for="pwInput">Password</label>
+          <a href="forgot-password.html" class="forgot-link"
+            >Forgot Password?</a
+          >
+        </div>
+        <div class="input-wrap">
+          <span class="input-icon" aria-hidden="true">
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+            >
+              <rect x="4" y="9" width="12" height="9" rx="2" />
+              <path d="M7 9V6a3 3 0 016 0v3" stroke-linecap="round" />
+            </svg>
+          </span>
+          <input
+            type="password"
+            id="pwInput"
+            placeholder="••••••••"
+            autocomplete="current-password"
+          />
+          <button
+            class="toggle-pw"
+            id="togglePw"
+            type="button"
+            aria-label="Toggle password visibility"
+            onclick="togglePassword()"
+          >
+            <svg
+              id="eyeIcon"
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+            >
+              <path d="M1 10s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" />
+              <circle cx="10" cy="10" r="2.5" />
+            </svg>
+          </button>
+        </div>
+        <div class="error-msg" id="pwErr">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span>Password is required.</span>
+        </div>
+      </div>
+
+      <!-- Sign In -->
+      <button class="btn-signin" id="signInBtn" onclick="handleSignIn()">
+        <div class="spinner" id="spinner"></div>
+        <span id="btnText">Sign In</span>
+        <svg
+          id="btnArrow"
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M4 10h12M11 5l5 5-5 5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+
+      <div class="register-row">
+        Don't have an account? <a href="create-account.html">Create Account</a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <a href="#">Help Center</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+    </footer>
+
+    <script src="../scripts/api.js"></script>
+    <script src="../scripts/login.js"></script>
+  </body>
+</html>

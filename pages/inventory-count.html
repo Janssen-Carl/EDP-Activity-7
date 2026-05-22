@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Count</title>
+    <link rel="stylesheet" href="../styles/shared.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
+    <style>
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .page-header { margin-bottom: 30px; }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; background: #2563EB; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-access:hover { background: #1D4ED8; }
+        .btn-secondary { background: #64748B; }
+        .btn-secondary:hover { background: #475569; }
+        .btn-danger { background: #EF4444; }
+        .btn-danger:hover { background: #DC2626; }
+        .btn-success { background: #22C55E; }
+        .btn-success:hover { background: #16A34A; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border: 1px solid #E2E8F0; }
+        th { background: #2563EB; color: white; font-weight: 600; }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-in-progress { background: #FEF08A; color: #78350F; }
+        .badge-completed { background: #D1FAE5; color: #065F46; }
+        .badge-verified { background: #DBEAFE; color: #0C4A6E; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); }
+        .modal.show { display: block; }
+        .modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 8px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .close { float: right; font-size: 28px; font-weight: bold; cursor: pointer; color: #999; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; color: #334155; }
+        input, select { width: 100%; padding: 8px 12px; border: 1.5px solid #E2E8F0; border-radius: 6px; font-size: 14px; }
+        input:focus, select:focus { outline: none; border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .alert { padding: 12px 15px; border-radius: 6px; margin-bottom: 15px; }
+        .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
+        .alert-error { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #E2E8F0; }
+        .tab-btn { padding: 10px 20px; border: none; background: none; cursor: pointer; color: #64748B; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .tab-btn.active { color: #2563EB; border-bottom-color: #2563EB; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;padding:10px 0;border-bottom:2px solid #E2E8F0;">
+            <a href="transactions-dashboard.html" style="text-decoration:none;color:#2563EB;font-weight:600;font-size:14px;">← Back to Dashboard</a>
+            <div style="display:flex;gap:10px;">
+                <a href="inventory-report.html" class="btn btn-secondary" style="font-size:12px;padding:6px 14px;text-decoration:none;">Inventory Report</a>
+            </div>
+        </div>
+        <div class="page-header">
+            <h1>Inventory Count Management</h1>
+            <p>Conduct and verify physical inventory counts</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('active-counts')">Active Counts</button>
+            <button class="tab-btn" onclick="switchTab('all-counts')">All Counts</button>
+        </div>
+
+        <!-- Active Counts Tab -->
+        <div id="active-counts" class="tab-content active">
+            <div class="btn-group">
+                <button class="btn" onclick="startNewCount()">+ Start New Count</button>
+                <button class="btn btn-secondary" onclick="loadActiveCounts()">Refresh</button>
+            </div>
+
+            <table id="activeCountsTable" class="display">
+                <thead>
+                    <tr>
+                        <th>Count ID</th>
+                        <th>Count Date</th>
+                        <th>Conducted By</th>
+                        <th>Status</th>
+                        <th>Expected</th>
+                        <th>Found</th>
+                        <th>Discrepancies</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="activeCountsBody"></tbody>
+            </table>
+        </div>
+
+        <!-- All Counts Tab -->
+        <div id="all-counts" class="tab-content">
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="loadAllCounts()">Refresh</button>
+            </div>
+
+            <table id="allCountsTable" class="display">
+                <thead>
+                    <tr>
+                        <th>Count ID</th>
+                        <th>Count Date</th>
+                        <th>Conducted By</th>
+                        <th>Verified By</th>
+                        <th>Status</th>
+                        <th>Expected</th>
+                        <th>Found</th>
+                        <th>Discrepancies</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="allCountsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Start Count Modal -->
+    <div id="startCountModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeStartCountModal()">&times;</span>
+            <h2>Start Inventory Count</h2>
+            <div id="startCountAlert"></div>
+            <form id="startCountForm">
+                <div class="form-group">
+                    <label>Notes (Optional)</label>
+                    <textarea style="width: 100%; padding: 8px 12px; border: 1.5px solid #E2E8F0; border-radius: 6px; font-size: 14px;" id="countNotes" rows="4" placeholder="Notes about this inventory count..."></textarea>
+                </div>
+                <button type="button" class="btn" style="width: 100%;" onclick="submitStartCount()">Start Count</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Record Quantity Modal -->
+    <div id="recordQuantityModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeRecordQuantityModal()">&times;</span>
+            <h2>Record Physical Quantities</h2>
+            <div id="recordQuantityAlert"></div>
+            
+            <div class="form-group" style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px; margin-top: 15px;">
+                <input type="text" id="bookFilter" placeholder="Search book title..." onkeyup="filterInventoryTable()" style="flex: 1;">
+                <button type="button" class="btn btn-success" style="padding: 8px 16px; background-color: #22C55E; white-space: nowrap;" onclick="saveInventoryCountProgress(false)">
+                    Save Progress
+                </button>
+            </div>
+
+            <table id="inventoryRecordTable" class="display" style="font-size: 12px;">
+                <thead>
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Expected Qty</th>
+                        <th>Physical Qty</th>
+                        <th>Variance</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryTableBody"></tbody>
+            </table>
+
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button type="button" class="btn btn-success" style="flex: 1;" onclick="completeInventoryCount()">Complete Count</button>
+                <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeRecordQuantityModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script src="../scripts/inventory-count.js?v=3"></script>
+</body>
+</html>

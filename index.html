@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Library Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/shared.css">
+    <link rel="stylesheet" href="styles/index.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-book"></i>
+                </span>
+                <div class="logo-text">
+                    <div class="logo-title">E-Library</div>
+                    <div class="logo-subtitle">Library System</div>
+                </div>
+            </div>
+            <div class="nav-center">
+            </div>
+            <div class="nav-right">
+                <a href="pages/login.html" class="action-btn">Sign In</a>
+                <a href="pages/create-account.html" class="action-btn btn-outline">Create Account</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Welcome to E-Library System</h1>
+            <p>Your comprehensive solution for digital library management. Manage books, track borrowing, and generate insights.</p>
+            <div class="hero-search">
+                <input type="text" class="search-box-hero" placeholder="Search books, literatures...">
+            </div>
+            <div class="hero-buttons">
+                <a href="pages/login.html" class="btn btn-primary">Get Started</a>
+                <a href="#features" class="btn btn-secondary">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <h2 class="section-title">Core Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon-badge">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h3>Book Management</h3>
+                <p>Comprehensive catalog management with advanced search, filtering, and categorization capabilities.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-badge">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <h3>Borrowing & Returns</h3>
+                <p>Streamlined borrowing process with automatic due date tracking and return management.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-badge">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h3>Smart Notifications</h3>
+                <p>Automated alerts for overdue books, new arrivals, and important system notifications.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-badge">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Analytics & Reports</h3>
+                <p>Detailed reports on library activity, borrowing trends, and inventory status with export options.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-badge">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3>User Management</h3>
+                <p>Secure user administration with role-based access control and activity tracking.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-badge">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3>Security</h3>
+                <p>Enterprise-grade security with encrypted data storage and secure authentication mechanisms.</p>
+            </div>
+        </div>
+    </section>
+
+    
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Ready to Transform Your Library?</h2>
+            <p>Join thousands of institutions using our system to streamline library operations</p>
+            <div class="cta-buttons">
+                <a href="pages/login.html" class="action-btn btn-primary">Sign In to Dashboard</a>
+                <a href="pages/create-account.html" class="action-btn btn-outline">Create New Account</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>System</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="pages/login.html">Login</a></li>
+                    <li><a href="pages/create-account.html">Create Account</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="pages/forgot-password.html">Forgot Password?</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#">Contact Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 E-Library Management System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Report</title>
+    <link rel="stylesheet" href="../styles/shared.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .page-header { margin-bottom: 30px; }
+        .report-controls { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .btn { padding: 10px 20px; background: #2563EB; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .btn:hover { background: #1D4ED8; }
+        .btn-export { background: #22C55E; }
+        .btn-export:hover { background: #16A34A; }
+        .btn-secondary { background: #64748B; }
+        .btn-secondary:hover { background: #475569; }
+        select { padding: 8px 12px; border: 1.5px solid #E2E8F0; border-radius: 6px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .summary-card { background: #F8FAFC; padding: 15px; border-radius: 8px; border-left: 4px solid #2563EB; }
+        .summary-card.warning { border-left-color: #F59E0B; }
+        .summary-card.error { border-left-color: #EF4444; }
+        .summary-value { font-size: 24px; font-weight: 700; color: #1E293B; }
+        .summary-label { font-size: 12px; color: #64748B; margin-top: 5px; }
+        .inventory-header { background: #F8FAFC; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .header-item { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid #E2E8F0; }
+        .header-label { font-weight: 500; color: #64748B; font-size: 12px; }
+        .header-value { font-weight: 700; color: #1E293B; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #2563EB; color: white; padding: 12px; text-align: left; font-weight: 600; }
+        td { padding: 12px; border-bottom: 1px solid #E2E8F0; }
+        tr:hover { background: #F8FAFC; }
+        .variance-positive { color: #EF4444; font-weight: 600; }
+        .variance-negative { color: #22C55E; font-weight: 600; }
+        .alert { padding: 12px 15px; border-radius: 6px; margin-bottom: 15px; }
+        .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
+        .alert-error { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;padding:10px 0;border-bottom:2px solid #E2E8F0;">
+            <a href="transactions-dashboard.html" style="text-decoration:none;color:#2563EB;font-weight:600;font-size:14px;">← Back to Dashboard</a>
+            <div style="display:flex;gap:10px;">
+                <a href="inventory-count.html" class="btn btn-secondary" style="font-size:12px;padding:6px 14px;text-decoration:none;">Manage Inventory</a>
+            </div>
+        </div>
+        <div class="page-header">
+            <h1>Inventory Count Report</h1>
+            <p>Physical inventory count records and analysis</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <!-- Report Controls -->
+        <div class="report-controls">
+            <select id="countSelect" onchange="selectCountReport()" style="flex: 1; max-width: 300px;">
+                <option value="">-- Select an inventory count --</option>
+            </select>
+            <button class="btn" onclick="generateReport()">Generate Report</button>
+            <button class="btn btn-export" onclick="exportToExcel()">
+                Export to Excel
+            </button>
+        </div>
+
+        <!-- Inventory Header Info -->
+        <div id="inventoryHeaderContainer"></div>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid" id="summaryContainer"></div>
+        
+        <!-- Charts Section -->
+        <div class="charts-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-bottom: 30px;">
+            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;">
+                <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #1E293B;">Inventory Accuracy</h3>
+                <div style="height: 250px; position: relative;">
+                    <canvas id="accuracyChart"></canvas>
+                </div>
+            </div>
+            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;">
+                <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #1E293B;">Expected vs Physical Quantity</h3>
+                <div style="height: 250px; position: relative;">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div style="overflow-x: auto;">
+            <table id="reportTable" class="display">
+                <thead>
+                    <tr>
+                        <th>Book ID</th>
+                        <th>Book Title</th>
+                        <th>ISBN</th>
+                        <th>Author</th>
+                        <th>Category</th>
+                        <th>Expected Qty</th>
+                        <th>Physical Qty</th>
+                        <th>Variance</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script>
+        const API_URL = '../backend/public/transactions-api.php';
+        let reportData = [];
+        let currentCountId = null;
+        let accuracyChart = null;
+        let comparisonChart = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInventoryCounts();
+        });
+
+        /**
+         * Load all inventory counts
+         */
+        function loadInventoryCounts() {
+            fetch(`${API_URL}?endpoint=inventory-counts&limit=100`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        const select = document.getElementById('countSelect');
+                        data.data.forEach(count => {
+                            const option = document.createElement('option');
+                            option.value = count.CountID;
+                            option.textContent = `Count #${count.CountID} - ${new Date(count.CountDate).toLocaleDateString()} (${count.CountStatus})`;
+                            select.appendChild(option);
+                        });
+
+                        // Auto-select first if available
+                        if (data.data.length > 0) {
+                            select.value = data.data[0].CountID;
+                            generateReport();
+                        }
+                    }
+                })
+                .catch(error => console.error('Error loading counts:', error));
+        }
+
+        /**
+         * Handle count selection
+         */
+        function selectCountReport() {
+            const countId = document.getElementById('countSelect').value;
+            if (countId) {
+                generateReport();
+            }
+        }
+
+        /**
+         * Generate report
+         */
+        function generateReport() {
+            const countId = document.getElementById('countSelect').value;
+            
+            if (!countId) {
+                showAlert('Please select an inventory count', 'error');
+                return;
+            }
+
+            currentCountId = countId;
+
+            fetch(`${API_URL}?endpoint=inventory-report&countId=${countId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        reportData = data.data;
+                        displayReport(data);
+                    } else {
+                        showAlert('Error: ' + data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('Failed to generate report', 'error');
+                });
+        }
+
+        /**
+         * Display report
+         */
+        function displayReport(data) {
+            // Display header info
+            const headerContainer = document.getElementById('inventoryHeaderContainer');
+            const header = data.header;
+
+            headerContainer.innerHTML = `
+                <div class="inventory-header">
+                    <div class="header-item">
+                        <span class="header-label">Count Date</span>
+                        <span class="header-value">${new Date(header.CountDate).toLocaleDateString()}</span>
+                    </div>
+                    <div class="header-item">
+                        <span class="header-label">Count Status</span>
+                        <span class="header-value">${header.CountStatus}</span>
+                    </div>
+                    <div class="header-item">
+                        <span class="header-label">Conducted By</span>
+                        <span class="header-value">${header.ConductedByName}</span>
+                    </div>
+                    <div class="header-item">
+                        <span class="header-label">Verified By</span>
+                        <span class="header-value">${header.VerifiedByName || 'Not yet verified'}</span>
+                    </div>
+                </div>
+            `;
+
+            // Display summary cards
+            const summaryContainer = document.getElementById('summaryContainer');
+            const summary = data.summary;
+
+            summaryContainer.innerHTML = `
+                <div class="summary-card">
+                    <div class="summary-value">${header.TotalBooksExpected}</div>
+                    <div class="summary-label">Expected Books</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value">${header.TotalBooksFound}</div>
+                    <div class="summary-label">Found Books</div>
+                </div>
+                <div class="summary-card ${header.Discrepancies > 0 ? 'error' : ''}">
+                    <div class="summary-value">${header.Discrepancies}</div>
+                    <div class="summary-label">Discrepancies</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value">${summary.perfectMatch}</div>
+                    <div class="summary-label">Perfect Matches</div>
+                </div>
+                <div class="summary-card warning">
+                    <div class="summary-value">${summary.discrepancies}</div>
+                    <div class="summary-label">Items with Variance</div>
+                </div>
+            `;
+
+            // Render Charts
+            renderCharts(summary, data.data);
+
+            // Display table
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            data.data.forEach(record => {
+                const variance = record.PhysicalQuantity - record.ExpectedQuantity;
+                const varianceClass = variance > 0 ? 'variance-positive' : (variance < 0 ? 'variance-negative' : '');
+                const varianceText = variance === 0 ? '✓ Match' : (variance > 0 ? `+${variance}` : `${variance}`);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.BookID}</td>
+                    <td>${record.BookTitle}</td>
+                    <td>${record.ISBN}</td>
+                    <td>${record.Author}</td>
+                    <td>${record.Category_Name || '-'}</td>
+                    <td style="text-align: center;">${record.ExpectedQuantity}</td>
+                    <td style="text-align: center;">${record.PhysicalQuantity}</td>
+                    <td style="text-align: center;" class="${varianceClass}">${varianceText}</td>
+                    <td>${record.Notes || '-'}</td>
+                `;
+
+                // Highlight rows with discrepancies
+                if (variance !== 0) {
+                    row.style.backgroundColor = variance > 0 ? '#FEE2E2' : '#FEF3C7';
+                }
+
+                tbody.appendChild(row);
+            });
+        }
+
+        /**
+         * Render charts
+         */
+        function renderCharts(summary, data) {
+            // 1. Accuracy Chart
+            if (accuracyChart) accuracyChart.destroy();
+            const accuracyCtx = document.getElementById('accuracyChart').getContext('2d');
+            accuracyChart = new Chart(accuracyCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Perfect Match', 'Discrepancies'],
+                    datasets: [{
+                        data: [summary.perfectMatch, summary.discrepancies],
+                        backgroundColor: ['#22C55E', '#EF4444'],
+                        borderColor: ['#16A34A', '#DC2626'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' }
+                    }
+                }
+            });
+
+            // 2. Comparison Chart (Top 10 items)
+            if (comparisonChart) comparisonChart.destroy();
+            
+            const topData = data.slice(0, 10);
+            
+            const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+            comparisonChart = new Chart(comparisonCtx, {
+                type: 'bar',
+                data: {
+                    labels: topData.map(item => item.BookTitle.substring(0, 15) + (item.BookTitle.length > 15 ? '...' : '')),
+                    datasets: [
+                        {
+                            label: 'Expected',
+                            data: topData.map(item => item.ExpectedQuantity),
+                            backgroundColor: '#64748B'
+                        },
+                        {
+                            label: 'Physical',
+                            data: topData.map(item => item.PhysicalQuantity),
+                            backgroundColor: '#2563EB'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        /**
+         * Export to Excel
+         */
+        function exportToExcel() {
+            if (!currentCountId || reportData.length === 0) {
+                showAlert('No data to export. Please generate report first.', 'error');
+                return;
+            }
+
+            const payload = {
+                countId: currentCountId,
+                generatedBy: JSON.parse(localStorage.getItem('user') || '{}').FullName || 'Administrator'
+            };
+
+            showAlert('Generating Excel file...', 'success');
+
+            fetch(`${API_URL}?endpoint=export-inventory-excel`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const link = document.createElement('a');
+                    link.href = data.filepath;
+                    link.download = data.filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showAlert('Excel report downloaded successfully!', 'success');
+                } else {
+                    showAlert('Error: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Failed to export report', 'error');
+            });
+        }
+
+        /**
+         * Show alert
+         */
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+            alertContainer.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

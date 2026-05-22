@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Borrowing Transactions</title>
+    <link rel="stylesheet" href="../styles/shared.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
+    <style>
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .page-header { margin-bottom: 30px; }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; background: #2563EB; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .btn:hover { background: #1D4ED8; }
+        .btn-secondary { background: #64748B; }
+        .btn-secondary:hover { background: #475569; }
+        .btn-success { background: #22C55E; }
+        .btn-success:hover { background: #16A34A; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border: 1px solid #E2E8F0; }
+        th { background: #2563EB; color: white; font-weight: 600; }
+        tr:hover { background: #F8FAFC; }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-active { background: #D1FAE5; color: #065F46; }
+        .badge-overdue { background: #FEE2E2; color: #991B1B; }
+        .badge-returned { background: #D1D5DB; color: #374151; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); }
+        .modal.show { display: block; }
+        .modal-content { background: white; margin: 10% auto; padding: 30px; border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .close { float: right; font-size: 28px; font-weight: bold; cursor: pointer; color: #999; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; color: #334155; }
+        input, select { width: 100%; padding: 8px 12px; border: 1.5px solid #E2E8F0; border-radius: 6px; font-size: 14px; }
+        input:focus, select:focus { outline: none; border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .alert { padding: 12px 15px; border-radius: 6px; margin-bottom: 15px; }
+        .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
+        .alert-error { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: #F8FAFC; padding: 15px; border-radius: 8px; border-left: 4px solid #2563EB; }
+        .stat-value { font-size: 24px; font-weight: 700; color: #1E293B; }
+        .stat-label { font-size: 12px; color: #64748B; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;padding:10px 0;border-bottom:2px solid #E2E8F0;">
+            <a href="transactions-dashboard.html" style="text-decoration:none;color:#2563EB;font-weight:600;font-size:14px;">← Back to Dashboard</a>
+            <div style="display:flex;gap:10px;">
+                <a href="borrowing-report.html" class="btn btn-secondary" style="font-size:12px;padding:6px 14px;text-decoration:none;"> Borrowing Report</a>
+            </div>
+        </div>
+        <div class="page-header">
+            <h1>Book Borrowing Transactions</h1>
+            <p>Manage and track all book borrowing activities</p>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats" id="statsContainer">
+            <div class="stat-card">
+                <div class="stat-value" id="statTotal">0</div>
+                <div class="stat-label">Total Borrowings</div>
+            </div>
+            <div class="stat-card" style="border-left-color: #22C55E;">
+                <div class="stat-value" id="statActive">0</div>
+                <div class="stat-label">Active Borrowings</div>
+            </div>
+            <div class="stat-card" style="border-left-color: #EF4444;">
+                <div class="stat-value" id="statOverdue">0</div>
+                <div class="stat-label">Overdue Books</div>
+            </div>
+            <div class="stat-card" style="border-left-color: #94A3B8;">
+                <div class="stat-value" id="statReturned">0</div>
+                <div class="stat-label">Returned</div>
+            </div>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="openBorrowModal()">+ New Borrowing</button>
+            <button class="btn btn-secondary" onclick="filterByStatus('Active')">Active Only</button>
+            <button class="btn btn-secondary" onclick="filterByStatus('Overdue')">Overdue Only</button>
+            <button class="btn btn-secondary" onclick="loadBorrowingData()">Refresh</button>
+        </div>
+
+        <table id="borrowingTable" class="display">
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Member Name</th>
+                    <th>Book Title</th>
+                    <th>ISBN</th>
+                    <th>Borrow Date</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Borrow Book Modal -->
+    <div id="borrowModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeBorrowModal()">&times;</span>
+            <h2>New Borrowing Transaction</h2>
+            <div id="borrowFormAlert"></div>
+            <form id="borrowForm">
+                <div class="form-group">
+                    <label>Select Book *</label>
+                    <select id="borrowBookId" required>
+                        <option value="">-- Select a book --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Select Member *</label>
+                    <select id="borrowUserId" required>
+                        <option value="">-- Select a member --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Due Days</label>
+                    <input type="number" id="borrowDueDays" value="14" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <input type="text" id="borrowNotes" placeholder="Optional notes">
+                </div>
+                <button type="button" class="btn" style="width: 100%;" onclick="submitBorrowForm()">Create Borrowing</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Return Book Modal -->
+    <div id="returnModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeReturnModal()">&times;</span>
+            <h2>Return Borrowed Book</h2>
+            <div id="returnFormAlert"></div>
+            <form id="returnForm">
+                <div class="form-group">
+                    <label>Transaction ID</label>
+                    <input type="text" id="returnTransactionId" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Book Title</label>
+                    <input type="text" id="returnBookTitle" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Book Condition *</label>
+                    <select id="returnBookCondition" required>
+                        <option value="Good">Good</option>
+                        <option value="Minor Damage">Minor Damage</option>
+                        <option value="Major Damage">Major Damage</option>
+                        <option value="Lost">Lost</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <input type="text" id="returnNotes" placeholder="Optional notes">
+                </div>
+                <button type="button" class="btn" style="width: 100%;" onclick="submitReturnForm()">Process Return</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script src="../scripts/borrowing-transactions.js?v=3"></script>
+</body>
+</html>

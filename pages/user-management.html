@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>e-Library System — User Management</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles/shared.css" />
+    <link rel="stylesheet" href="../styles/user-management.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1>User Management</h1>
+        </div>
+        <div class="header-actions">
+          <button class="btn-primary" onclick="openCreateAccount()">
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+            >
+              <circle cx="10" cy="7" r="3" />
+              <path
+                d="M6 15c0-2 2-4 4-4s4 2 4 4M16 10v4m-2-2h4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Add User
+          </button>
+          <button class="btn-secondary" onclick="goToTransactions()">
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+            >
+              <path
+                d="M15 10H5M9 5l5 5-5 5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Transactions
+          </button>
+          <button class="btn-secondary" onclick="goBack()">
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+            >
+              <path
+                d="M15 10H5M9 5l-5 5 5 5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- Search and Filter -->
+      <div class="search-filter-card">
+        <div class="search-wrapper">
+          <div class="search-input-group">
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+            >
+              <circle cx="8" cy="8" r="5" />
+              <path d="M12 12l5 5" stroke-linecap="round" />
+            </svg>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search by name or email..."
+              onkeyup="filterUsers()"
+            />
+          </div>
+          <div class="filter-group">
+            <select id="typeFilter" onchange="filterUsers()">
+              <option value="">All Types</option>
+              <option value="Member">Member</option>
+              <option value="Librarian">Librarian</option>
+              <option value="Guest">Guest</option>
+            </select>
+            <select id="statusFilter" onchange="filterUsers()">
+              <option value="">All Status</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+              <option value="Suspended">Suspended</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users Table -->
+      <div class="table-card">
+        <div class="table-info" id="tableInfo">
+          Showing <strong id="resultCount">10</strong> users
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Date Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTable">
+              <!-- Users will be populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+        <!-- <div class="pagination-info" id="paginationInfo">
+      Total Users: 10
+    </div> -->
+      </div>
+    </div>
+
+    <script src="../scripts/api.js"></script>
+    <script src="../scripts/user-management.js"></script>
+  </body>
+</html>

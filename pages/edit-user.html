@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>e-Library System — Edit User</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../styles/shared.css">
+<link rel="stylesheet" href="../styles/edit-user.css">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Edit User</h1>
+    <button class="btn-back" onclick="goBack()">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10H5M9 5l-5 5 5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back
+    </button>
+  </div>
+
+  <!-- User Card -->
+  <div class="user-card">
+
+    <!-- User Header -->
+    <div class="user-header">
+      <div class="avatar" id="userAvatar">M</div>
+      <div class="user-info">
+        <h2 id="userName"></h2>
+        <p id="userEmail"></p>
+        <p id="userTypeText" style="margin-top: 8px; color: var(--blue); font-weight: 600;"></p>
+      </div>
+    </div>
+
+    <!-- Form Content -->
+    <div class="form-content">
+
+      <!-- Alert -->
+      <div class="alert alert-error" id="alertBanner" role="alert" aria-live="polite">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+        <span id="alertText">Please check the form for errors.</span>
+      </div>
+
+      <form onsubmit="handleUpdateUser(event)">
+
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">Personal Information</h3>
+
+          <div class="form-group">
+            <label for="fullName">Full Name</label>
+            <div class="input-wrap">
+              <span class="input-icon">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="6" r="3"/><path d="M4 18c0-3 2.7-6 6-6s6 3 6 6" stroke-linecap="round"/></svg>
+              </span>
+              <input type="text" id="fullName" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <div class="input-wrap">
+                <span class="input-icon">
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="16" height="11" rx="2"/><path d="M2 7l8 5 8-5" stroke-linecap="round"/></svg>
+                </span>
+                <input type="email" id="email" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <div class="input-wrap">
+                <span class="input-icon">
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <input type="tel" id="phone">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Status Section -->
+        <div class="form-section">
+          <h3 class="section-title">Account Status</h3>
+
+          <div class="status-section">
+            <div class="status-row">
+              <span>Current Status</span>
+              <span class="status-badge active" id="currentStatus">Active</span>
+            </div>
+            <div class="status-row">
+              <span>Account Type</span>
+              <span class="status-badge" id="accountType">Member</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="userType">User Type</label>
+              <div class="input-wrap">
+                <select id="userType" required>
+                  <option value="Member">Member</option>
+                  <option value="Librarian">Librarian</option>
+                  <option value="Guest">Guest</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="accountStatus">Status</label>
+              <div class="input-wrap">
+                <select id="accountStatus" required>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                  <option value="Suspended">Suspended</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">Account Information</h3>
+
+          <div class="status-section">
+            <div class="status-row">
+              <span>Member Since</span>
+              <span id="memberSince">Jan 15, 2022</span>
+            </div>
+            <div class="status-row">
+              <span>Last Login</span>
+              <span id="lastLogin">Today at 9:45 AM</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="discardChanges()">Discard</button>
+          <button type="submit" class="btn-primary" id="submitBtn">
+            <div class="spinner" id="spinner"></div>
+            <span id="btnText">Save Changes</span>
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="../scripts/api.js"></script>
+<script src="../scripts/edit-user.js"></script>
+
+</body>
+</html>
